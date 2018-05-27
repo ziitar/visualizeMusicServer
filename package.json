@@ -1,0 +1,24 @@
+{
+  "name": "personal-music",
+  "version": "0.0.1",
+  "description": "a personal-music website ",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "music"
+  ],
+  "author": "ziitor",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.6.0",
+    "big-integer": "^1.6.28",
+    "body-parser": "^1.18.2",
+    "client-sessions": "^0.8.0",
+    "mongoose": "^5.0.17",
+    "request": "^2.85.0",
+    "restify": "^7.1.1"
+  }
+}
