@@ -19,6 +19,7 @@
     "client-sessions": "^0.8.0",
     "mongoose": "^5.0.17",
     "request": "^2.85.0",
-    "restify": "^7.1.1"
+    "restify": "^7.1.1",
+    "restify-cors-middleware": "^1.1.1"
   }
 }
