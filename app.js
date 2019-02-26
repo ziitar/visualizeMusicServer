@@ -43,25 +43,48 @@ server
 *   登录中间件
 * */
 function loginMessage(req, res, next) {
-    if (req.musicSession) {
-        if (req.musicSession.sign && req.musicSession.user) {
-            return next()
-        } else {
-            res.send({
-                message: 'NOT LOGIN',
-                status: 'FALL',
-                result: null
-            });
-            return next(false);
-        }
-    } else {
-        res.send({
-            message: 'NOT LOGIN',
-            status: 'FALL',
-            result: null
-        });
-        return next(false);
-    }
+    User.findOne({userName: 'ziitar'})
+        .populate('sheets')
+        .exec((err, doc) => {
+            if (err) {
+            console.log('run'+err)
+                res.status(500)
+                res.send({
+                    message: 'Internal Server Error',
+                    status: 'FALL',
+                    result: err
+                });
+            }else if (doc) {
+                req.musicSession.sign = true;
+                req.musicSession.user = doc;
+                return next();
+            } else {
+                res.send({
+                    message: 'NOT KNOW ERROR',
+                    status: 'FALL',
+                    result: null
+                })
+            }
+        })
+    // if (req.musicSession) {
+    //     if (req.musicSession.sign && req.musicSession.user) {
+    //         return next()
+    //     } else {
+    //         res.send({
+    //             message: 'NOT LOGIN',
+    //             status: 'FALL',
+    //             result: null
+    //         });
+    //         return next(false);
+    //     }
+    // } else {
+    //     res.send({
+    //         message: 'NOT LOGIN',
+    //         status: 'FALL',
+    //         result: null
+    //     });
+    //     return next(false);
+    // }
 }
 
 
@@ -205,8 +228,7 @@ server.post('/user/register', (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             User.findOne({_id: doc._id})
                 .populate('sheets')
                 .exec((err, doc) => {
@@ -217,8 +239,7 @@ server.post('/user/register', (req, res, next) => {
                             status: 'FALL',
                             result: err
                         });
-                    }
-                    if (doc) {
+                    }else if (doc) {
                         req.musicSession.user = doc;
                         req.musicSession.sign = true;
                         let user = {
@@ -258,6 +279,7 @@ server.post('/user/register', (req, res, next) => {
  *  POST
  */
 server.post('/user/login', (req, res, next) => {
+    console.log(req)
     User.findOne({userName: req.body.name})
         .populate('sheets')
         .exec((err, doc) => {
@@ -268,8 +290,7 @@ server.post('/user/login', (req, res, next) => {
                     status: 'FALL',
                     result: err
                 });
-            }
-            if (doc) {
+            }else if (doc) {
                 if (doc.password === req.body.password) {
                     req.musicSession.user = doc;
                     req.musicSession.sign = true;
@@ -330,8 +351,7 @@ server.get('/user/name', (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             res.send({
                 message: 'User already exists',
                 status: 'FAIL',
@@ -362,8 +382,7 @@ server.get('/user/user', loginMessage, (req, res, next) => {
                     status: 'FALL',
                     result: err
                 });
-            }
-            if (doc) {
+            }else if (doc) {
                 const user = {
                     userName: doc.userName,
                     email: doc.email,
@@ -415,8 +434,7 @@ server.get('/song', loginMessage, (req, res, next) => {
                     status: 'FALL',
                     result: err
                 });
-            }
-            if (doc) {
+            }else if (doc) {
                 res.send({
                     message: 'Successfully acquired songs',
                     status: 'SUCCESS',
@@ -430,7 +448,6 @@ server.get('/song', loginMessage, (req, res, next) => {
                 })
             }
         })
-
 });
 /*
 *   新建歌单
@@ -450,8 +467,7 @@ server.post('/sheet', loginMessage, (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             User.findOne({_id: req.musicSession.user._id}, (err, user) => {
                 if (err) {
                     res.status(500)
@@ -460,8 +476,7 @@ server.post('/sheet', loginMessage, (req, res, next) => {
                         status: 'FALL',
                         result: err
                     });
-                }
-                if (user) {
+                }else if (user) {
                     user.sheets.push(doc._id);
                     user.save(function (err, doc) {
                         if (err) {
@@ -471,8 +486,7 @@ server.post('/sheet', loginMessage, (req, res, next) => {
                                 status: 'FALL',
                                 result: err
                             });
-                        }
-                        if (doc) {
+                        }else if (doc) {
                             User.findOne({_id: req.musicSession.user._id})
                                 .populate('sheets')
                                 .exec((err, doc) => {
@@ -483,8 +497,7 @@ server.post('/sheet', loginMessage, (req, res, next) => {
                                             status: 'FALL',
                                             result: err
                                         });
-                                    }
-                                    if (doc) {
+                                    }else if (doc) {
                                         req.musicSession.user = doc;
                                         res.send({
                                             message: 'Successfully acquired songs',
@@ -532,8 +545,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             Sheet.findOne({_id: req.body.sheet_id}, (err, sheet) => {
                 if (err) {
                     res.status(500)
@@ -542,8 +554,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                         status: 'FALL',
                         result: err
                     });
-                }
-                if (sheet) {
+                }else if (sheet) {
                     if (sheet.songs.includes(doc._id)) {
                         res.send({
                             message: 'The song already exists in the song list',
@@ -561,8 +572,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                                     status: 'FALL',
                                     result: err
                                 });
-                            }
-                            if (doc) {
+                            }else if (doc) {
                                 async.mapSeries(req.musicSession.user.sheets, (sheet, cb) => {
                                     if (sheet._id === doc._id) {
                                         Sheet.findOne({_id: doc._id})
@@ -575,8 +585,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                                                         status: 'FALL',
                                                         result: err
                                                     });
-                                                }
-                                                if (doc) {
+                                                }else if (doc) {
                                                     cb(null, doc);
                                                 } else {
                                                     res.send({
@@ -638,8 +647,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                         status: 'FALL',
                         result: err
                     });
-                }
-                if (doc) {
+                }else if (doc) {
                     Sheet.findOne({_id: req.body.sheet_id}, (err, sheet) => {
                         if (err) {
                             res.status(500)
@@ -648,8 +656,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                                 status: 'FALL',
                                 result: err
                             });
-                        }
-                        if (sheet) {
+                        }else if (sheet) {
                             sheet.songs.push(doc._id);
                             sheet.songNum++;
                             sheet.save((err, doc) => {
@@ -660,8 +667,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                                         status: 'FALL',
                                         result: err
                                     });
-                                }
-                                if (doc) {
+                                }else if (doc) {
                                     async.mapSeries(req.musicSession.user.sheets, (sheet, cb) => {
                                         if (sheet._id === doc._id) {
                                             Sheet.findOne({_id: doc._id})
@@ -674,8 +680,7 @@ server.put('/sheet', loginMessage, (req, res, next) => {
                                                             status: 'FALL',
                                                             result: err
                                                         });
-                                                    }
-                                                    if (doc) {
+                                                    }else if (doc) {
                                                         cb(null, doc);
                                                     } else {
                                                         res.send({
@@ -743,8 +748,9 @@ server.get('/loveSheet', loginMessage, (req, res, next) => {
             .findOne({_id: sheet})
             .populate('songs')
             .exec((err, doc) => {
-                if (err) callback(err);
-                if (doc) callback(null, doc)
+                if (err) {
+                    callback(err);
+                }else if (doc) callback(null, doc)
             })
     }, (err, sheets) => {
         if (err) {
@@ -754,8 +760,7 @@ server.get('/loveSheet', loginMessage, (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (sheets) {
+        }else if (sheets) {
             res.send({
                 message: 'Successfully acquired the collection song list',
                 status: 'SUCCESS',
@@ -784,8 +789,7 @@ server.get('/comment/song', (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             res.send({
                 message: 'Successfully get song comment information',
                 status: 'SUCCESS',
@@ -814,8 +818,7 @@ server.get('/comment/sheet', (req, res, next) => {
                 status: 'FALL',
                 result: err
             });
-        }
-        if (doc) {
+        }else if (doc) {
             res.send({
                 message: 'Successfully get song list comments',
                 status: 'SUCCESS',
@@ -846,8 +849,7 @@ server.get('/recommend', (req, res, next) => {
                     status: 'FALL',
                     result: err
                 });
-            }
-            if (doc) {
+            }else if (doc) {
                 res.send({
                     message: 'Successfully get recommended songs',
                     status: 'SUCCESS',
