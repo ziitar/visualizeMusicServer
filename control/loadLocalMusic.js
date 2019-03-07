@@ -14,17 +14,16 @@ function loadLocalMusic(cb) {
             return console.log(err);
         }
         async.mapSeries(dirs,function (dir,callback) {
-            var s=dir.split('-');
-            var musicInfo={
+            let musicInfo={
                 musicName:'',
                 musicAuthor:'',
                 musicUrl:''
             };
-            musicInfo.musicName=s[0];
+            musicInfo.musicName=dir.slice(dir.indexOf('-'),dir.indexOf('.'));
             musicInfo.musicUrl='/music/'+dir;
-            let musicAuthors=s[1].split('.')[0];
-            if (musicAuthors.includes('、')){
-                musicInfo.musicAuthor=musicAuthors.split('、');
+            let musicAuthors=dir.slice(0,dir.indexOf('-'));
+            if (musicAuthors.includes(',')){
+                musicInfo.musicAuthor=musicAuthors.split(',');
                 async.mapSeries(musicInfo.musicAuthor,function(author){
                     singer.findOne({singerName:author},function(err,singers){
                         if (err) callback(err);
