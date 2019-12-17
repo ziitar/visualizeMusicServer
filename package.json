@@ -17,7 +17,7 @@
     "big-integer": "^1.6.28",
     "body-parser": "^1.18.2",
     "client-sessions": "^0.8.0",
-    "mongoose": "^5.0.17",
+    "mongoose": "^5.7.5",
     "request": "^2.85.0",
     "restify": "^7.1.1",
     "restify-cors-middleware": "^1.1.1"
