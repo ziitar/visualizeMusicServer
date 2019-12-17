@@ -19,6 +19,7 @@ const server = restify.createServer();
 
 const cors = corsMiddleware({
     preflightMaxAge: 5, //Optional
+    credentials: true,
     origins: ['http://localhost:4200'],
     allowHeaders: ['API-Token'],
     exposeHeaders: ['API-Token-Expiry']
@@ -32,10 +33,10 @@ server
         duration: 24 * 60 * 60 * 1000 * 7
     }))
     .use(cors.actual)
+    .pre(cors.preflight)
     .use(restify.plugins.queryParser({mapParams: true}))
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({extended: false}))
-    .pre(cors.preflight);
+    .use(bodyParser.urlencoded({extended: false}));
 
 
 //注册路由
@@ -43,48 +44,48 @@ server
 *   登录中间件
 * */
 function loginMessage(req, res, next) {
-    User.findOne({userName: 'ziitar'})
-        .populate('sheets')
-        .exec((err, doc) => {
-            if (err) {
-            console.log('run'+err)
-                res.status(500)
-                res.send({
-                    message: 'Internal Server Error',
-                    status: 'FALL',
-                    result: err
-                });
-            }else if (doc) {
-                req.musicSession.sign = true;
-                req.musicSession.user = doc;
-                return next();
-            } else {
-                res.send({
-                    message: 'NOT KNOW ERROR',
-                    status: 'FALL',
-                    result: null
-                })
-            }
-        })
-    // if (req.musicSession) {
-    //     if (req.musicSession.sign && req.musicSession.user) {
-    //         return next()
-    //     } else {
-    //         res.send({
-    //             message: 'NOT LOGIN',
-    //             status: 'FALL',
-    //             result: null
-    //         });
-    //         return next(false);
-    //     }
-    // } else {
-    //     res.send({
-    //         message: 'NOT LOGIN',
-    //         status: 'FALL',
-    //         result: null
-    //     });
-    //     return next(false);
-    // }
+    // User.findOne({userName: 'ziitar'})
+    //     .populate('sheets')
+    //     .exec((err, doc) => {
+    //         if (err) {
+    //         console.log('run'+err)
+    //             res.status(500)
+    //             res.send({
+    //                 message: 'Internal Server Error',
+    //                 status: 'FALL',
+    //                 result: err
+    //             });
+    //         }else if (doc) {
+    //             req.musicSession.sign = true;
+    //             req.musicSession.user = doc;
+    //             return next();
+    //         } else {
+    //             res.send({
+    //                 message: 'NOT KNOW ERROR',
+    //                 status: 'FALL',
+    //                 result: null
+    //             })
+    //         }
+    //     })
+    if (req.musicSession) {
+        if (req.musicSession.sign && req.musicSession.user) {
+            return next()
+        } else {
+            res.send({
+                message: 'NOT LOGIN',
+                status: 'FALL',
+                result: null
+            });
+            return next(false);
+        }
+    } else {
+        res.send({
+            message: 'NOT LOGIN',
+            status: 'FALL',
+            result: null
+        });
+        return next(false);
+    }
 }
 
 

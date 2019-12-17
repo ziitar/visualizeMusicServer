@@ -12,7 +12,7 @@ var songSchema=new mongoose.Schema({
     author:[String],
     url:String,
     like:{
-        type:Number,
+        type: Number,
         default:0
     },
     cloudMusicId:Number,
