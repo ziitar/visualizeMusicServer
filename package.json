@@ -13,7 +13,7 @@
   "author": "ziitor",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.0",
+    "async": "^2.6.4",
     "big-integer": "^1.6.28",
     "body-parser": "^1.18.2",
     "client-sessions": "^0.8.0",
